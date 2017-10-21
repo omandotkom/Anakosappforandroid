@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,9 +19,18 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.location.places.GeoDataClient;
+import com.google.android.gms.location.places.PlaceDetectionClient;
+import com.google.android.gms.location.places.Places;
+import com.google.android.gms.location.places.PlacesOptions;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -32,6 +42,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 
 public class MapsFragment extends Fragment implements
@@ -44,13 +56,74 @@ LocationListener{
     public static String TAG = "ACTIVITY_MAPS";
     MapView mMapView;
     private GoogleMap googleMap;
-    Location mLastLocation;
+   Location mLastLocation;
     Marker mCurrLocationMarker;
-    LocationRequest mLocationRequest;
     GoogleApiClient mGoogleApiClient;
-    Marker KosLk, KosPrmpn;
+    private LocationRequest mLocationRequest;
+    private long UPDATE_INTERVAL = 10 * 1000;  /* 10 secs */
+    private long FASTEST_INTERVAL = 2000; /* 2 sec */
+private    Marker KosLk, KosPrmpn;
+    protected GeoDataClient mGeoDataClient;
+    private double latitude=-1;
+    private double longitude=-1;
+    protected PlaceDetectionClient mPlaceDetectionClient;
+    protected void startLocationUpdates() {
 
+        // Create the location request to start receiving updates
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(UPDATE_INTERVAL);
+        mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
 
+        // Create LocationSettingsRequest object using location request
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
+        builder.addLocationRequest(mLocationRequest);
+        LocationSettingsRequest locationSettingsRequest = builder.build();
+
+        // Check whether location settings are satisfied
+        // https://developers.google.com/android/reference/com/google/android/gms/location/SettingsClient
+        SettingsClient settingsClient = LocationServices.getSettingsClient(getContext());
+        settingsClient.checkLocationSettings(locationSettingsRequest);
+
+        // new Google API SDK v11 uses getFusedLocationProviderClient(this)
+       try{LocationServices.getFusedLocationProviderClient(getContext()).requestLocationUpdates(mLocationRequest, new LocationCallback() {
+                   @Override
+                   public void onLocationResult(LocationResult locationResult) {
+                       // do work here
+  //                     onLocationChanged(locationResult.getLastLocation());
+                       //TODO: this is the main code for places
+                       onLocationChanged(locationResult.getLastLocation());
+               LocationServices.getFusedLocationProviderClient(getContext()).removeLocationUpdates(this);
+                   }
+               },
+               Looper.myLooper());}catch(SecurityException se){
+           Log.d(TAG,"Error : Security Exception, cause : " + se.getMessage());
+       }
+
+    }
+
+    /*public void getLastLocation() {
+        // Get last known recent location using new Google Play Services SDK (v11+)
+        FusedLocationProviderClient locationClient = getFusedLocationProviderClient(this);
+
+        locationClient.getLastLocation()
+                .addOnSuccessListener(new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // GPS location can be null if GPS is switched off
+                        if (location != null) {
+                            onLocationChanged(location);
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("MapDemoActivity", "Error trying to get last GPS location");
+                        e.printStackTrace();
+                    }
+                });
+    }*/
     public static MapsFragment newInstance(){
         MapsFragment fragment = new MapsFragment();
         return fragment;
@@ -68,9 +141,16 @@ LocationListener{
         View rootView = inflater.inflate(R.layout.fragment_maps, container, false);
         mMapView = (MapView) rootView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
-
+        buildGoogleApiClient();
+    //startLocationUpdates();
         mMapView.onResume(); // needed to get the map to display immediately
 Log.d(TAG,"View created...");
+        // Construct a GeoDataClient.
+
+        mGeoDataClient = Places.getGeoDataClient(getContext(), null);
+
+        // Construct a PlaceDetectionClient.
+        mPlaceDetectionClient = Places.getPlaceDetectionClient(getContext(), null);
 
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
@@ -84,15 +164,17 @@ Log.d(TAG,"View created...");
             @Override
             public void onMapReady(GoogleMap mMap) {
               Log.d(TAG,"onMapReadyCallback");
-              
+             // double loc = mLastLocation.getLatitude();
+             // Log.d(TAG,String.valueOf(loc));
+               // mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 12.0f));
               googleMap = mMap;
-
                 //Initialize Google Play Services
                 if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     if (ContextCompat.checkSelfPermission(getActivity(),
                             android.Manifest.permission.ACCESS_FINE_LOCATION)
                             == PackageManager.PERMISSION_GRANTED) {
-                        buildGoogleApiClient();
+                       //TODO : Building google api client old, the new one is on onCreate method
+                        //buildGoogleApiClient();
                         mMap.setMyLocationEnabled(true);
                     }
                 } else {
@@ -145,6 +227,8 @@ Log.d(TAG,"View created...");
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
                 .build();
         mGoogleApiClient.connect();
     }
@@ -184,13 +268,26 @@ Log.d(TAG,"View created...");
         if (ContextCompat.checkSelfPermission(getActivity(),
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            //TODO : here i make a comment
+//            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
             Log.d(TAG,"Connected ->Permission granted");
-
+startLocationUpdates();
         }else{
             Log.d(TAG,"Connected ->Permission not granted");
         }
 
+    }
+    private int PROXIMITY_RADIUS = 10000;
+    private String getUrl(double latitude, double longitude, String nearbyPlace) {
+
+        StringBuilder googlePlacesUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
+        googlePlacesUrl.append("location=" + latitude + "," + longitude);
+        googlePlacesUrl.append("&radius=" + PROXIMITY_RADIUS);
+        googlePlacesUrl.append("&type=" + nearbyPlace);
+        googlePlacesUrl.append("&sensor=true");
+        googlePlacesUrl.append("&key=" + "AIzaSyATuUiZUkEc_UgHuqsBJa1oqaODI-3mLs0");
+        Log.d(TAG + " getUrl", googlePlacesUrl.toString());
+        return (googlePlacesUrl.toString());
     }
 
     @Override
@@ -205,27 +302,44 @@ Log.d(TAG,"Connection Failed");
 
     @Override
     public void onLocationChanged(Location location) {
-
         mLastLocation = location;
         if (mCurrLocationMarker != null) {
             mCurrLocationMarker.remove();
         }
-
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
         //Place current location marker
+        String newLoc = Double.toString(latitude) + "," + Double.toString(longitude);
+        Log.d(TAG,"Location changed to " + newLoc);
+        latitude= location.getLatitude();
+        longitude = location.getLongitude();
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
-        markerOptions.title("Current Position");
+        markerOptions.title("Your position");
+        //Todo : Ubah jadi xml
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
         mCurrLocationMarker = googleMap.addMarker(markerOptions);
 
         //move map camera
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        googleMap.animateCamera(CameraUpdateFactory.zoomTo(11));
+        googleMap.animateCamera(CameraUpdateFactory.zoomTo(25));
+//TODO : Ini baru
+        googleMap.clear();
+        String url = getUrl(latitude, longitude, "Kost");
+        Object[] DataTransfer = new Object[2];
+        DataTransfer[0] = googleMap;
+        DataTransfer[1] = url;
+        Log.d(TAG,"Places URL = " + url);
+        GetNearbyPlacesData getNearbyPlacesData = new GetNearbyPlacesData();
+        getNearbyPlacesData.execute(DataTransfer);
+
+       // LocationServices.getFusedLocationProviderClient(getContext()).removeLocationUpdates(this);
 
         //stop location updates
         if (mGoogleApiClient != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        Log.d(TAG,"LocationUpdate's listener successfully removed");
         }
 
     }
@@ -265,6 +379,7 @@ Log.d(TAG,"Connection Failed");
             //You can add here other case statements according to your requirement.
         }
     }
+
 }
 
 

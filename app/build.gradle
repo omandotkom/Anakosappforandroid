@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.0"
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "com.example.erlangga.anakosapp"
         minSdkVersion 16
@@ -30,12 +30,12 @@ dependencies {
     compile 'com.android.support:appcompat-v7:26.0.0'
     compile 'com.google.android.gms:play-services-maps:11.4.0'
     compile 'com.google.android.gms:play-services-location:11.4.0'
-    compile 'com.google.android.gms:play-services:11.4.0'
     compile 'com.google.android.gms:play-services-nearby:11.4.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.google.firebase:firebase-auth:11.4.0'
     compile 'com.google.firebase:firebase-storage:11.4.0'
     compile 'com.google.firebase:firebase-database:11.4.0'
+    compile 'com.google.android.gms:play-services-places:11.4.0'
     compile 'com.google.android.gms:play-services-auth:11.4.0'
     compile 'com.android.support:design:26.0.0'
     compile 'com.android.support:support-v4:26.0.0'
