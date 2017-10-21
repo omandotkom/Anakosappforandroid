@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -27,6 +29,7 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -63,13 +66,11 @@ LocationListener{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_maps, container, false);
-
-
         mMapView = (MapView) rootView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
 
         mMapView.onResume(); // needed to get the map to display immediately
-
+Log.d(TAG,"View created...");
 
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
@@ -82,8 +83,9 @@ LocationListener{
 
             @Override
             public void onMapReady(GoogleMap mMap) {
-                googleMap = mMap;
-
+              Log.d(TAG,"onMapReadyCallback");
+              
+              googleMap = mMap;
 
                 //Initialize Google Play Services
                 if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -106,7 +108,7 @@ LocationListener{
                 //kos laki-laki dan perempuan
                 LatLng pwt = new LatLng(-7.431391, 109.247833);
                 googleMap.addMarker(new MarkerOptions().position(pwt).title("Warala kos"). snippet("Klik untuk lebih lanjut") .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-
+                Log.d(TAG,"Marker added");
                 LatLng magentaKos = new LatLng(-7.431391, 109.244454);
                 googleMap.addMarker(new MarkerOptions().position(magentaKos).title("Magenta kos"). snippet("Klik untuk lebih lanjut") .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)));
                 googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
@@ -174,6 +176,7 @@ LocationListener{
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
+        Log.d(TAG,"Succesfully Connected");
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(1000);
         mLocationRequest.setFastestInterval(1000);
@@ -182,18 +185,22 @@ LocationListener{
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            Log.d(TAG,"Connected ->Permission granted");
+
+        }else{
+            Log.d(TAG,"Connected ->Permission not granted");
         }
 
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-
+Log.d(TAG,"Connection Suspended");
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
+Log.d(TAG,"Connection Failed");
     }
 
     @Override
