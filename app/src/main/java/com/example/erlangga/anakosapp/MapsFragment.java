@@ -326,7 +326,7 @@ Log.d(TAG,"Connection Failed");
         googleMap.animateCamera(CameraUpdateFactory.zoomTo(25));
 //TODO : Ini baru
         googleMap.clear();
-        String url = getUrl(latitude, longitude, "Kost");
+        String url = getUrl(latitude, longitude, "Park");
         Object[] DataTransfer = new Object[2];
         DataTransfer[0] = googleMap;
         DataTransfer[1] = url;
