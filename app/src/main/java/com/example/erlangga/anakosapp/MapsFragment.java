@@ -19,7 +19,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -30,8 +29,6 @@ import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.PlaceDetectionClient;
 import com.google.android.gms.location.places.Places;
-import com.google.android.gms.location.places.PlacesOptions;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -39,12 +36,9 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PointOfInterest;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 
 public class MapsFragment extends Fragment implements
@@ -52,22 +46,56 @@ public class MapsFragment extends Fragment implements
 GoogleApiClient.OnConnectionFailedListener,
 LocationListener{
 
-    private static final int MY_LOCATION_REQUEST_CODE = 99;
+    public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
     final static int REQUEST_LOCATION = 199;
+    private static final int MY_LOCATION_REQUEST_CODE = 99;
     public static String TAG = "ACTIVITY_MAPS";
+    protected GeoDataClient mGeoDataClient;
+    protected PlaceDetectionClient mPlaceDetectionClient;
     MapView mMapView;
-    private GoogleMap googleMap;
    Location mLastLocation;
     Marker mCurrLocationMarker;
     GoogleApiClient mGoogleApiClient;
+    private GoogleMap googleMap;
     private LocationRequest mLocationRequest;
     private long UPDATE_INTERVAL = 10 * 1000;  /* 10 secs */
     private long FASTEST_INTERVAL = 2000; /* 2 sec */
 private    Marker KosLk, KosPrmpn;
-    protected GeoDataClient mGeoDataClient;
     private double latitude=-1;
     private double longitude=-1;
-    protected PlaceDetectionClient mPlaceDetectionClient;
+
+    public MapsFragment(){
+
+    }
+
+    /*public void getLastLocation() {
+        // Get last known recent location using new Google Play Services SDK (v11+)
+        FusedLocationProviderClient locationClient = getFusedLocationProviderClient(this);
+
+        locationClient.getLastLocation()
+                .addOnSuccessListener(new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // GPS location can be null if GPS is switched off
+                        if (location != null) {
+                            onLocationChanged(location);
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("MapDemoActivity", "Error trying to get last GPS location");
+                        e.printStackTrace();
+                    }
+                });
+    }*/
+    public static MapsFragment newInstance(){
+        MapsFragment fragment = new MapsFragment();
+        return fragment;
+
+    }
+
     protected void startLocationUpdates() {
 
         // Create the location request to start receiving updates
@@ -102,40 +130,6 @@ private    Marker KosLk, KosPrmpn;
        }
 
     }
-
-    /*public void getLastLocation() {
-        // Get last known recent location using new Google Play Services SDK (v11+)
-        FusedLocationProviderClient locationClient = getFusedLocationProviderClient(this);
-
-        locationClient.getLastLocation()
-                .addOnSuccessListener(new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        // GPS location can be null if GPS is switched off
-                        if (location != null) {
-                            onLocationChanged(location);
-                        }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d("MapDemoActivity", "Error trying to get last GPS location");
-                        e.printStackTrace();
-                    }
-                });
-    }*/
-    public static MapsFragment newInstance(){
-        MapsFragment fragment = new MapsFragment();
-        return fragment;
-
-    }
-
-    public MapsFragment(){
-
-    }
-
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -228,8 +222,6 @@ googleMap.setOnPoiClickListener(new GoogleMap.OnPoiClickListener() {
         return rootView;
     }
 
-
-
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                 .addConnectionCallbacks(this)
@@ -265,6 +257,18 @@ googleMap.setOnPoiClickListener(new GoogleMap.OnPoiClickListener() {
         mMapView.onLowMemory();
     }
 
+    /*private String getUrl(double latitude, double longitude, String nearbyPlace) {
+
+        StringBuilder googlePlacesUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
+        googlePlacesUrl.append("location=" + latitude + "," + longitude);
+        googlePlacesUrl.append("&radius=" + PROXIMITY_RADIUS);
+        googlePlacesUrl.append("&type=" + nearbyPlace);
+        googlePlacesUrl.append("&sensor=true");
+        googlePlacesUrl.append("&key=" + "AIzaSyATuUiZUkEc_UgHuqsBJa1oqaODI-3mLs0");
+
+       Log.d(TAG + " getUrl", googlePlacesUrl.toString());
+        return (googlePlacesUrl.toString());
+    }*/
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
@@ -284,24 +288,6 @@ startLocationUpdates();
             Log.d(TAG,"Connected ->Permission not granted");
         }
 
-    }
-    private int PROXIMITY_RADIUS = 10000;
-    private String getUrl(double latitude, double longitude, String nearbyPlace) {
-
-       /* StringBuilder googlePlacesUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
-        googlePlacesUrl.append("location=" + latitude + "," + longitude);
-        googlePlacesUrl.append("&radius=" + PROXIMITY_RADIUS);
-        googlePlacesUrl.append("&type=" + nearbyPlace);
-        googlePlacesUrl.append("&sensor=true");
-        googlePlacesUrl.append("&key=" + "AIzaSyATuUiZUkEc_UgHuqsBJa1oqaODI-3mLs0");
-       */
-       StringBuilder googlePlacesUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/textsearch/json?");
-       googlePlacesUrl.append("&key=AIzaSyATuUiZUkEc_UgHuqsBJa1oqaODI-3mLs0");
-       googlePlacesUrl.append("&location=" +latitude + "," + longitude);
-       googlePlacesUrl.append("&radius=" + PROXIMITY_RADIUS);
-       googlePlacesUrl.append("&query=" + "kost");
-       Log.d(TAG + " getUrl", googlePlacesUrl.toString());
-        return (googlePlacesUrl.toString());
     }
 
     @Override
@@ -340,14 +326,15 @@ Log.d(TAG,"Connection Failed");
         googleMap.animateCamera(CameraUpdateFactory.zoomTo(25));
 //TODO : Ini baru
         googleMap.clear();
-        String url = getUrl(latitude, longitude, "mosque");
-        Object[] DataTransfer = new Object[2];
-        DataTransfer[0] = googleMap;
-        DataTransfer[1] = url;
-        Log.d(TAG,"Places URL = " + url);
-        GetNearbyPlacesData getNearbyPlacesData = new GetNearbyPlacesData();
-        getNearbyPlacesData.execute(DataTransfer);
+       // String url = new URLCreatorNearbyKost(latitude,longitude,"kost").getURL();
+        //Object[] DataTransfer = new Object[2];
+        //DataTransfer[0] = googleMap;
+        //DataTransfer[1] = url;
+        //Log.d(TAG,"Places URL = " + url);
 
+        GetNearbyPlacesData getNearbyPlacesData = new GetNearbyPlacesData(latitude,longitude,googleMap,getActivity().getApplicationContext());
+        getNearbyPlacesData.showAll();
+        //getNearbyPlacesData.execute(DataTransfer);
        // LocationServices.getFusedLocationProviderClient(getContext()).removeLocationUpdates(this);
 
         //stop location updates
@@ -357,9 +344,6 @@ Log.d(TAG,"Connection Failed");
         }
 
     }
-
-    public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode,

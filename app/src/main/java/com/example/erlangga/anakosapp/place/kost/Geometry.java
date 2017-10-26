@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
 
 public class Geometry{
 
-    Location location = new Location("com.example.erlangga.anakosapp.place.kost");
+   private Location location = new Location("com.example.erlangga.anakosapp.place.kost");
     public Geometry(@NonNull double latitude, @NonNull double longitude){
        this.location.setLatitude( latitude);
        this.location.setLongitude(longitude);

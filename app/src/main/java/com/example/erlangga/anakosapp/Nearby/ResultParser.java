@@ -39,10 +39,10 @@ public class ResultParser {
         try {
             if (jsonObject.length() != 0) {
                 JSONArray jsonArray = jsonObject.getJSONArray(RESULT);
-                KostModelGoogle kostModelGoogle = new KostModelGoogle();
                 for (int i = 0; i <= jsonArray.length() - 1; i++) {
                     jsonObject = jsonArray.getJSONObject(i);
                     //ambil alamat
+                    KostModelGoogle kostModelGoogle = new KostModelGoogle();
                     kostModelGoogle.setAddress(jsonObject.getString(FORMATTED_ADDRESS));
                     //ambil json location
                     JSONObject jsonLoc = jsonObject.getJSONObject(GEOMETRY).getJSONObject(LOCATION);
@@ -61,11 +61,6 @@ public class ResultParser {
         getKostModelGoogleList();
     }
 public ArrayList<KostModelGoogle> getKostModelGoogleList() {
-        Log.d("Voll", "Size " + String.valueOf(this.kostModelGoogleArrayList.size()));
-        Log.d("Voll","Sample Data :" + this.kostModelGoogleArrayList.get(2).getName());
-        Log.d("Voll","Sample Loc :" + this.kostModelGoogleArrayList.get(2).getGeometri().toString());
-
-
         return this.kostModelGoogleArrayList;
 }
 }

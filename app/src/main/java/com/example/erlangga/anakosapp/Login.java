@@ -8,14 +8,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.example.erlangga.anakosapp.Nearby.GetNearbyKost;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -29,13 +27,12 @@ public class Login extends AppCompatActivity implements  GoogleApiClient.OnConne
 
     //private ProgressDialog mProgress;
 
+    private static  final int RC_SIGN_IN=2123;
+    private final String TAG = "LOGIN_ACTIVITY";
     private SignInButton mGoogleBtn;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    private static  final int RC_SIGN_IN=2123;
-    private static final String TAG = "LOGIN_PAGE";
     private GoogleApiClient mGoogleApiClient;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,8 +82,14 @@ public class Login extends AppCompatActivity implements  GoogleApiClient.OnConne
     @Override
     public void onStart() {
         //TODO : here i put temporary GetNearByKost
-        new GetNearbyKost("https://maps.googleapis.com/maps/api/place/textsearch/json?&key=AIzaSyAyretCH6e8gbO9Q_UToRVgJPl-vLTHdqw&location=-7.4112975,109.2439519&radius=10000&query=kost",null,Login.this);
-        super.onStart();
+      /* GetNearbyKost getNearbyKost =  new GetNearbyKost("https://maps.googleapis.com/maps/api/place/textsearch/json?&key=AIzaSyAyretCH6e8gbO9Q_UToRVgJPl-vLTHdqw&location=-7.4112975,109.2439519&radius=10000&query=kost",null,Login.this);
+       getNearbyKost.getDataFromURL(new ResponseCallback() {
+           @Override
+           public void onGetNearbyKostDataLoaded(ArrayList<KostModelGoogle> kostModelGoogleArrayList) {
+           Log.d(TAG,"Sample name : " + kostModelGoogleArrayList.get(0).getName());
+           }
+       });*/
+       super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         mAuth.addAuthStateListener(mAuthListener);
         FirebaseUser user = mAuth.getCurrentUser();
