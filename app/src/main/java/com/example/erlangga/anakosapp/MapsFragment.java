@@ -42,6 +42,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PointOfInterest;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
@@ -163,11 +164,18 @@ Log.d(TAG,"View created...");
 
             @Override
             public void onMapReady(GoogleMap mMap) {
-              Log.d(TAG,"onMapReadyCallback");
+                googleMap = mMap;
+googleMap.setOnPoiClickListener(new GoogleMap.OnPoiClickListener() {
+    @Override
+    public void onPoiClick(PointOfInterest pointOfInterest) {
+        Log.d(TAG,"POI CLICKED");
+
+    }
+});
+                Log.d(TAG,"onMapReadyCallback");
              // double loc = mLastLocation.getLatitude();
              // Log.d(TAG,String.valueOf(loc));
                // mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 12.0f));
-              googleMap = mMap;
                 //Initialize Google Play Services
                 if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     if (ContextCompat.checkSelfPermission(getActivity(),
@@ -280,13 +288,19 @@ startLocationUpdates();
     private int PROXIMITY_RADIUS = 10000;
     private String getUrl(double latitude, double longitude, String nearbyPlace) {
 
-        StringBuilder googlePlacesUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
+       /* StringBuilder googlePlacesUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
         googlePlacesUrl.append("location=" + latitude + "," + longitude);
         googlePlacesUrl.append("&radius=" + PROXIMITY_RADIUS);
         googlePlacesUrl.append("&type=" + nearbyPlace);
         googlePlacesUrl.append("&sensor=true");
         googlePlacesUrl.append("&key=" + "AIzaSyATuUiZUkEc_UgHuqsBJa1oqaODI-3mLs0");
-        Log.d(TAG + " getUrl", googlePlacesUrl.toString());
+       */
+       StringBuilder googlePlacesUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/textsearch/json?");
+       googlePlacesUrl.append("&key=AIzaSyATuUiZUkEc_UgHuqsBJa1oqaODI-3mLs0");
+       googlePlacesUrl.append("&location=" +latitude + "," + longitude);
+       googlePlacesUrl.append("&radius=" + PROXIMITY_RADIUS);
+       googlePlacesUrl.append("&query=" + "kost");
+       Log.d(TAG + " getUrl", googlePlacesUrl.toString());
         return (googlePlacesUrl.toString());
     }
 
@@ -326,7 +340,7 @@ Log.d(TAG,"Connection Failed");
         googleMap.animateCamera(CameraUpdateFactory.zoomTo(25));
 //TODO : Ini baru
         googleMap.clear();
-        String url = getUrl(latitude, longitude, "Park");
+        String url = getUrl(latitude, longitude, "mosque");
         Object[] DataTransfer = new Object[2];
         DataTransfer[0] = googleMap;
         DataTransfer[1] = url;
@@ -379,6 +393,7 @@ Log.d(TAG,"Connection Failed");
             //You can add here other case statements according to your requirement.
         }
     }
+
 
 }
 

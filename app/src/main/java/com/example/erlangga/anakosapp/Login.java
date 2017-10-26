@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.erlangga.anakosapp.Nearby.GetNearbyKost;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -38,6 +39,7 @@ public class Login extends AppCompatActivity implements  GoogleApiClient.OnConne
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         mGoogleBtn= (SignInButton) findViewById(R.id.SignInGoogle);
@@ -82,6 +84,8 @@ public class Login extends AppCompatActivity implements  GoogleApiClient.OnConne
 
     @Override
     public void onStart() {
+        //TODO : here i put temporary GetNearByKost
+        new GetNearbyKost("https://maps.googleapis.com/maps/api/place/textsearch/json?&key=AIzaSyAyretCH6e8gbO9Q_UToRVgJPl-vLTHdqw&location=-7.4112975,109.2439519&radius=10000&query=kost",null,Login.this);
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         mAuth.addAuthStateListener(mAuthListener);
