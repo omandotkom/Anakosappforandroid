@@ -1,0 +1,59 @@
+{
+  "project_info": {
+    "project_number": "11633153849",
+    "firebase_url": "https://fir-anakkost.firebaseio.com",
+    "project_id": "firebase-anakkost",
+    "storage_bucket": "firebase-anakkost.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:11633153849:android:48383cd76e43c315",
+        "android_client_info": {
+          "package_name": "com.example.erlangga.anakosapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "11633153849-fh86mi88v1sas3v1frh9q12r80eb92a4.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "11633153849-fi9bpffsjb5a4d9auao3dq2ko62ufoka.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.erlangga.anakosapp",
+            "certificate_hash": "1669204aa66bb7db50f8087134a160bbb592d717"
+          }
+        },
+        {
+          "client_id": "11633153849-l88u6hpckk23jff4sqna68ipepnomto6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC4cBz7JspZyVYXU2eSv_9_MdMjyudU654"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "11633153849-fh86mi88v1sas3v1frh9q12r80eb92a4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
