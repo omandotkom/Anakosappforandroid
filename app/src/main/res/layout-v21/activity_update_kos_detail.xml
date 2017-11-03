@@ -165,30 +165,33 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginLeft="5dp"
-                android:background="@drawable/almari" />
+                android:background="@drawable/almari"
+                android:contentDescription="@string/almariImg"/>
 
             <TextView
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="Almari" />
+                android:text="@string/almari" />
 
             <CheckBox
                 android:layout_width="30dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="56dp" />
+                android:layout_marginLeft="56dp"
+                android:contentDescription="@string/checkBoxUpdate"/>
 
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginLeft="5dp"
-                android:background="@drawable/parkirarea" />
+                android:background="@drawable/parkirarea"
+                android:contentDescription="@string/areaImg"/>
 
             <TextView
                 android:layout_width="70dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="Area Parkir" />
+                android:text="@string/areaparking" />
         </LinearLayout>
 
         <EditText
@@ -197,7 +200,7 @@
             android:layout_marginLeft="46dp"
             android:layout_marginRight="46dp"
             android:layout_marginTop="30dp"
-            android:hint="Biaya" />
+            android:hint="@string/biaya" />
 
         <EditText
             android:layout_width="match_parent"
@@ -205,7 +208,7 @@
             android:layout_marginLeft="46dp"
             android:layout_marginRight="46dp"
             android:layout_marginTop="10dp"
-            android:hint="/bulan" />
+            android:hint="@string/perbulan" />
 
         <EditText
             android:layout_width="match_parent"
@@ -213,7 +216,7 @@
             android:layout_marginLeft="46dp"
             android:layout_marginRight="46dp"
             android:layout_marginTop="10dp"
-            android:hint="Catatan" />
+            android:hint="@string/catatan" />
         <ImageButton
             android:layout_width="match_parent"
             android:layout_height="180dp"
